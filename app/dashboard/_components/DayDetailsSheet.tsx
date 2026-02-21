@@ -33,12 +33,14 @@ export default function DayDetailsSheet({
   onOpenChange,
   claimAction,
   unclaimAction,
+  undoCompleteAction,
 }: {
   day: DayDetails | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   claimAction: (formData: FormData) => Promise<void>;
   unclaimAction: (formData: FormData) => Promise<void>;
+  undoCompleteAction: (formData: FormData) => Promise<void>;
 }) {
   if (!day) return null;
 
@@ -103,11 +105,19 @@ export default function DayDetailsSheet({
           ) : null}
 
           {day.status === "completed" && day.historyHref ? (
-            <Button asChild className="w-full" variant="secondary">
-              <Link href={day.historyHref}>
-                View report
-              </Link>
-            </Button>
+            <div className="space-y-2">
+              <Button asChild className="w-full" variant="secondary">
+                <Link href={day.historyHref}>
+                  View report
+                </Link>
+              </Button>
+              <form action={undoCompleteAction}>
+                <input type="hidden" name="day" value={day.dayKey} />
+                <Button className="w-full" variant="outline" type="submit">
+                  Undo completion
+                </Button>
+              </form>
+            </div>
           ) : null}
         </div>
       </SheetContent>

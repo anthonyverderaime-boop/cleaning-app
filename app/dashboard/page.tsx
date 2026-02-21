@@ -125,6 +125,26 @@ async function unclaimDay(formData: FormData) {
   redirect(`/dashboard?month=${day.slice(0, 7)}&toast=unclaimed`);
 }
 
+async function undoCompletedDay(formData: FormData) {
+  "use server";
+
+  const day = sanitizeDay(formData.get("day"));
+  if (!day) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return redirect("/login");
+
+  await supabase.from("cleaning_history").delete().eq("day", day).eq("user_id", user.id);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/checklist");
+  revalidatePath("/dashboard/history");
+  redirect(`/dashboard?month=${day.slice(0, 7)}&toast=undone`);
+}
+
 type DashboardPageProps = {
   searchParams: Promise<{ month?: string; toast?: string }>;
 };
@@ -219,6 +239,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ? "Day claimed"
       : params.toast === "unclaimed"
       ? "Day unclaimed"
+      : params.toast === "undone"
+      ? "Completion undone"
       : null;
 
   const monthControls = (
@@ -281,6 +303,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 days={calendarDays}
                 claimAction={claimDay}
                 unclaimAction={unclaimDay}
+                undoCompleteAction={undoCompletedDay}
               />
             </CardContent>
           </Card>

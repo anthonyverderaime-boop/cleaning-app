@@ -19,6 +19,7 @@ export default function CalendarGrid({
   days,
   claimAction,
   unclaimAction,
+  undoCompleteAction,
 }: {
   monthLabel: string;
   weekdayLabels: string[];
@@ -26,6 +27,7 @@ export default function CalendarGrid({
   days: CalendarDayItem[];
   claimAction: (formData: FormData) => Promise<void>;
   unclaimAction: (formData: FormData) => Promise<void>;
+  undoCompleteAction: (formData: FormData) => Promise<void>;
 }) {
   const [selectedDay, setSelectedDay] = useState<CalendarDayItem | null>(null);
 
@@ -103,6 +105,7 @@ export default function CalendarGrid({
         }}
         claimAction={claimAction}
         unclaimAction={unclaimAction}
+        undoCompleteAction={undoCompleteAction}
       />
     </>
   );
